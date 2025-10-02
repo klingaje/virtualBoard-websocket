@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webbis</title>
+</head>
+<body>
+    <h2>VirtualBoard WebSocket</h2>
+
+    <input type="text" placeholder="Write here" id="textIn">
+    <p id="textOut"></p>
+    <p id="error"></p>
+    <p id="connection"></p>
+
+    <script>
+        WS_TOKEN = localStorage.getItem('ws_token') || 'hemliga-token';
+        console.log(WS_TOKEN)
+
+        const socket = new WebSocket(`ws://localhost:5000?token=${WS_TOKEN}`)
+
+        socket.onopen = function (event) {
+            document.getElementById('connection').innerHTML = 'connected to server'
+        }
+
+        socket.onmessage = function (event) {
+            console.log('Recieved message: ', event.data)
+            const data = JSON.parse(event.data)
+
+            if (data.status == 0) {
+                document.getElementById('textOut').innerHTML = data.msg
+                document.getElementById('error').innerHTML = ''
+            } else {
+                document.getElementById('error').innerHTML = data.msg
+            }
+        }
+
+        socket.onclose = function (event) {
+            document.getElementById('connection').innerHTML = 'connection closed'
+        }
+
+        document.querySelector('#textIn').addEventListener('input', (evt) => {
+            socket.send(evt.target.value);
+        });
+
+    </script>
+</body>
+</html>
