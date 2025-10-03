@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webbis</title>
 </head>
-<body>
-    <h2>VirtualBoard WebSocket</h2>
 
-    <input type="text" placeholder="Write here" id="textIn">
-    <p id="textOut"></p>
-    <p id="error"></p>
-    <p id="connection"></p>
+<body>
+
+
+
+    <div id="textContainer">
+        <h2>VirtualBoard WebSocket</h2>
+        <textarea type="text" placeholder="Write here" id="textIn"></textarea>
+        <p id="textOut"></p>
+        <p id="error"></p>
+        <p id="connection"></p>
+    </div>
 
     <script>
         WS_TOKEN = localStorage.getItem('ws_token') || 'hemliga-token';
@@ -44,5 +50,44 @@
         });
 
     </script>
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #textContainer {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            width: 500px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #textIn {
+            padding: 5px;
+            width: 490px;
+            height: 40px;
+            font-size: large;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        #textOut {
+            padding: 5px;
+            width: 490px;
+            height: 100px;
+            font-size: large;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            border: 0.5px solid;
+            border-color:black ;
+        }
+
+    </style>
 </body>
+
 </html>
