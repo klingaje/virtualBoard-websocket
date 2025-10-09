@@ -1,16 +1,20 @@
+const express = require('express')
 const WebSocket = require('ws')
 const os = require('os')
 require('dotenv').config()
-const loginRouter = require('./routes/login')
+
+
+const app = express()
 
 const PORT = process.env.PORT || 5000
 const wss = new WebSocket.Server({ port: PORT })
 
 const clients = new Set();
 
-app.use('/login', loginRouter)
+
 
 wss.on('connection', (ws, req) => {
+    console.log(`Running on http://localhost:${PORT}`)
     console.log('Client connected')
 
 
