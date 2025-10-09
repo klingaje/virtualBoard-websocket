@@ -1,10 +1,12 @@
 const express = require('express')
 const WebSocket = require('ws')
 const os = require('os')
+const cors = require('cors')
 require('dotenv').config()
 
 
 const app = express()
+app.use(cors())
 
 const PORT = process.env.PORT || 5000
 const wss = new WebSocket.Server({ port: PORT })
@@ -49,4 +51,15 @@ wss.on('connection', (ws, req) => {
         console.log('client disconnected')
     })
 
+    
+
+})
+
+app.listen(PORT, () => {
+    try {
+        console.log(`Running on http://localhost:${PORT}`)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+    
 })
