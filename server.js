@@ -23,7 +23,6 @@ wss.on('connection', (ws, req) => {
 
     const urlParams = new URLSearchParams(req.url.slice(1))
     const token = urlParams.get('token')
-    console.log("🔐 Received token:", token);
 
     if (!token) {
         ws.send(JSON.stringify({
