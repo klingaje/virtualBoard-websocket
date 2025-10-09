@@ -3,6 +3,7 @@ const WebSocket = require('ws')
 const os = require('os')
 const cors = require('cors')
 require('dotenv').config()
+const jwt = require('jsonwebtoken')
 
 
 const app = express()
@@ -21,14 +22,39 @@ wss.on('connection', (ws, req) => {
 
 
     const urlParams = new URLSearchParams(req.url.slice(1))
-    if (urlParams.get('token') !== process.env.TOKEN) {
-        console.log('invalid token: ' + urlParams.get('token'))
+    const token = urlParams.get('token')
+    console.log("🔐 Received token:", token);
+
+    if (!token) {
         ws.send(JSON.stringify({
             status: 1,
-            msg: 'ERROR: Invalid token'
-        }))
+            msg: 'ERROR: Missing token'
+        }));
         ws.close();
+        return;
     }
+
+    try {
+        const payload = jwt.verify(token, process.env.JWT_SECRET)
+        console.log('Token payload:', payload)
+    } catch (error) {
+        console.log('Token verification failed:', error.name, error.message)
+
+        if (error.name === 'TokenExpiredError') {
+            ws.send(JSON.stringify({
+                status: 1,
+                msg: 'ERROR: Session expired. Please log in again.'
+            }))
+        } else {
+            ws.send(JSON.stringify({
+                status: 1,
+                msg: 'ERROR: Invalid session token'
+            }))
+        }
+        ws.close()
+        return
+    }
+
 
     if (!clients.has(ws)) {
         clients.add(ws)
@@ -51,7 +77,7 @@ wss.on('connection', (ws, req) => {
         console.log('client disconnected')
     })
 
-    
+
 
 })
 
@@ -61,5 +87,5 @@ app.listen(PORT, () => {
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
-    
+
 })
