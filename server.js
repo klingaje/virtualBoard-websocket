@@ -41,6 +41,9 @@ wss.on('connection', (ws, req) => {
 
         if (error.name === 'TokenExpiredError') {
             ws.send(JSON.stringify({
+
+                //refresh token nånstans
+
                 status: 1,
                 msg: 'ERROR: Session expired. Please log in again.'
             }))
