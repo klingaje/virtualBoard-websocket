@@ -12,15 +12,14 @@ app.use(cors())
 const PORT = process.env.PORT || 8080
 const wss = new WebSocket.Server({ port: PORT })
 
-const clients = new Set();
-
+const userClients = new Map()
 
 
 wss.on('connection', (ws, req) => {
     console.log(`Running on http://localhost:${PORT}`)
     console.log('Client connected')
 
-
+    let payload
     const urlParams = new URLSearchParams(req.url.slice(1))
     const token = urlParams.get('token')
 
@@ -28,13 +27,13 @@ wss.on('connection', (ws, req) => {
         ws.send(JSON.stringify({
             status: 1,
             msg: 'ERROR: Missing token'
-        }));
-        ws.close();
-        return;
+        }))
+        ws.close()
+        return
     }
 
     try {
-        const payload = jwt.verify(token, process.env.JWT_SECRET)
+        payload = jwt.verify(token, process.env.JWT_SECRET)
         console.log('Token payload:', payload)
     } catch (error) {
         console.log('Token verification failed:', error.name, error.message)
@@ -57,21 +56,27 @@ wss.on('connection', (ws, req) => {
         return
     }
 
+    const userEmail = payload.email
 
-    if (!clients.has(ws)) {
-        clients.add(ws)
+    if (!userClients.has(userEmail)) {
+        userClients.set(userEmail, new Set())
     }
+    userClients.get(userEmail).add(ws)
 
     ws.on('message', (message) => {
         console.log('Recieved message: ', message)
 
-        clients.forEach(client => {
-            client.send(JSON.stringify({
-                status: 0,
-                msg: String(message),
+        const clients = userClients.get(userEmail)
+        if (!clients) return
 
-            }))
-        })
+        for (const client of clients) {
+            if(client.readyState == WebSocket.OPEN){
+                client.send(JSON.stringify({
+                    status: 0,
+                    msg: String(message),
+                }))
+            }
+        }
 
     })
 
